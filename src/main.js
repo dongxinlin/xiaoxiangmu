@@ -2,9 +2,13 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import './api'
 
 //引入公共样式
 import './styles/components.css'
+
+
+
 
 //安装elemet-ui
 import ElementUI from 'element-ui'

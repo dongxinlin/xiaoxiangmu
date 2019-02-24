@@ -1,98 +1,63 @@
 <template>
   <div class="login-container">
-    <el-form
-      :model="ruleForm2"
-      status-icon
-      :rules="rules2"
-      ref="ruleForm2"
-      label-width="100px"
-      class="demo-ruleForm"
-    >
-        <el-form-item
-          label="用户名:"
-          prop="username"
-        >
-          <el-input
-            type="type"
-            v-model="ruleForm2.username"
-            auto-complete="off"
-          ></el-input>
-        </el-form-item>
-        <el-form-item
-          label="密码:"
-          prop="pass"
-        >
-          <el-input
-            type="password"
-            v-model="ruleForm2.pass"
-            auto-complete="off"
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="submitForm('ruleForm2')"
-          >提交</el-button>
-        </el-form-item>
+    <h1>登录</h1>
+    <el-form ref="form" label-width="80px">
+      <el-form-item label="用户名">
+        <el-input v-model="username"></el-input>
+      </el-form-item>
+      <el-form-item label="密码">
+        <el-input v-model="password"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="signIn">登录</el-button>
+      </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    var username = (rule, value, callback) => {
-      if (!value.trim()) {
-        return callback(new Error("用户名不能为空"));
-      }
-       callback();
-    };
-    var validatePass = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入密码"));
-      } else {
-        if (this.ruleForm2.checkPass !== "") {
-          this.$refs.ruleForm2.validateField("checkPass");
+    data() {
+        return {
+            username:'',
+            password:''
         }
-        callback();
-      }
-    };
-    return {
-      ruleForm2: {
-        pass: "",
-        username: ""
-      },
-      rules2: {
-        pass: [{ validator: validatePass, trigger: "blur" }],
-        username: [{ validator: username, trigger: "blur" }]
-      }
-    };
-  },
-  methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          console.log(this)
-        } else {
-          return false;
-        }
-      });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    methods:{
+        signIn(){
+            if(this.username.trim().length!==0 && this.password.trim()!==0){
+                this.$axios.post('/users/login',{
+                    username:this.username,
+                    password:this.password
+                })
+                .then(res=>{
+                    if(res.status===200){
+                        localStorage.setItem('token',res.data.token)
+                        localStorage.setItem('useInfo',JSON.stringify(res.data))
+                        this.$router.push('/home')
+                    }
+                })
+            }else{
+                this.$message({
+                    showClose: true,
+                    message:"用户名和密码不能为空",
+                    type: 'error'
+                });
+            }
+        }
     }
-  }
-};
+}
 </script>
-
 
 <style lang="less" scoped>
 .login-container{
-  width: 600px;
-  position: absolute;
-  left: 50%;
-  top:50%;
-  transform: translate(-50%,-50%)
+    width: 600px;
+    margin: 100px auto;
+    h1{
+        text-align: center;
+        line-height: 50px;
+        color: aqua;
+        font-size: 18px;
+    }
 }
 </style>
